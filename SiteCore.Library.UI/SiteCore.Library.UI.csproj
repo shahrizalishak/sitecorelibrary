@@ -36,5 +36,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Book\" />
+    <Folder Include="Views\User\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\HomeController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Views\Home\Privacy.cshtml" />
+    <Content Remove="Views\Home\Index.cshtml" />
   </ItemGroup>
 </Project>

@@ -9,7 +9,8 @@ namespace SiteCore.Library.BAL.Entities
         [Required]
         public string Name { get; set; }
         [Required]
+        [EmailAddress]
         public string Email { get; set; }
-        public int MobileNo { get; set; }
+        public string MobileNo { get; set; }
     }
 }

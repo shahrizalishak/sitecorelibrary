@@ -20,7 +20,7 @@ namespace SiteCore.Library.BAL.Services
             return _userRepository.GetAll().ToList();
         }
 
-        public void CreateBook(User user)
+        public void CreateUser(User user)
         {
             _userRepository.Create(user);
         }
@@ -31,12 +31,12 @@ namespace SiteCore.Library.BAL.Services
             return user;
         }
 
-        public void UpdateBook(int id, User user)
+        public void UpdateUser(int id, User user)
         {
             _userRepository.Update(id, user);
         }
 
-        public void DeleteBook(int id)
+        public void DeleteUser(int id)
         {
             _userRepository.Delete(id);
         }
