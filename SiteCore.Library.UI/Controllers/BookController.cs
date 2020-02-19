@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using SiteCore.Library.BAL.Entities;
 using SiteCore.Library.BAL.Interfaces;
 using SiteCore.Library.BAL.Services;
-using SiteCore.Library.BAL.Entities;
 using SiteCore.Library.DAL;
 using SiteCore.Library.UI.Models;
 
@@ -39,37 +39,53 @@ namespace SiteCore.Library.UI.Controllers
         public ActionResult Details(int id)
         {
             var book = bookService.GetById(id);
+            var books = bookService.GetAuthorsById(id);
             return View(book);
         }
 
         // GET: Book/Create
         public ActionResult Create()
         {
-            return View();
+            var authors = bookService.GetAuthors();
+
+            var createBookViewModel = new CreateBookViewModel
+            {
+                AvailableAuthors = authors
+            };
+
+            return View(createBookViewModel);
         }
 
         // POST: Book/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Book book)
+        public ActionResult Create(CreateBookViewModel createBookViewModel)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var book = new Book()
+                    {
+                        Title = createBookViewModel.Book.Title
+                    };
+
+                    foreach (var authorId in createBookViewModel.SelectedAuthors)
+                    {
+                        book.AuthorId.Add(authorId);
+                    }
+
                     bookService.CreateBook(book);
 
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch
                 {
-                    TempData["ErrorMessage"] = ex.Message;
                     return View();
                 }
             }
 
-            return View(book);
-
+            return View();
         }
 
         // GET: Book/Edit/5
@@ -106,7 +122,7 @@ namespace SiteCore.Library.UI.Controllers
         // POST: Book/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, Book book)
+        public ActionResult DeleteConfirmed(int id)
         {
             try
             {

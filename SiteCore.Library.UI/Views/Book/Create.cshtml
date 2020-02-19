@@ -1,7 +1,7 @@
-﻿@model SiteCore.Library.BAL.Entities.Book
+﻿@model SiteCore.Library.UI.Models.CreateBookViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Add New";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -13,14 +13,22 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label asp-for="Book.Title" class="control-label"></label>
+                <input asp-for="Book.Title" class="form-control" />
+                <span asp-validation-for="Book.Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
+                <label asp-for="Book.Author" class="control-label"></label>
+                @foreach (var author in Model.AvailableAuthors)
+                {
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox"
+                                   name="SelectedAuthors"
+                                   value="@author.Id" /> @author.Name
+                            </label>
+                        </div>
+                    }
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -36,4 +44,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-

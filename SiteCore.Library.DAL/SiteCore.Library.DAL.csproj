@@ -14,4 +14,7 @@
   <ItemGroup>
     <None Remove="Library.db" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DataModels\" />
+  </ItemGroup>
 </Project>
