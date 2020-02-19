@@ -8,8 +8,10 @@ namespace SiteCore.Library.UI.Models
     {
         public BookViewModel()
         {
+            AuthorName = new List<int>();
         }
 
         public List<Book> Books { get; set; }
+        public List<int> AuthorName { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model SiteCore.Library.BAL.Entities.Book
+﻿@model SiteCore.Library.UI.Models.BookViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -10,15 +10,18 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
+        @foreach (var item in Model.Books)
+        {
         <div class="form-group">
-            <label asp-for="Title" class="control-label"></label>
-            : @Model.Title
+            <label class="control-label">Title</label>
+            :  @Html.DisplayFor(modelItem => item.Title)
         </div>
         <div class="form-group">
-            <label asp-for="Author" class="control-label"></label>
-            : @Model.Author
+            <label class="control-label">Author</label>
+            :   @Html.Encode(item.AuthorList)
         </div>
-    </div>
+        }
+        </div>
 </div>
 
 <div>

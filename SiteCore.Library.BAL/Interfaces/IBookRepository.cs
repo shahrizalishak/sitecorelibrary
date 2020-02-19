@@ -11,6 +11,7 @@ namespace SiteCore.Library.BAL.Interfaces
         void Delete(int bookId);
         Book GetById(int id);
         IList<Book> GetAll();
+        IList<Book> GetByIdNew(int id);
         IList<Author> GetAllAuthors();
         IList<Author> GetAuthorsById(int id);
     }

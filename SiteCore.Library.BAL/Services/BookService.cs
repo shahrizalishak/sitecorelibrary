@@ -31,6 +31,11 @@ namespace SiteCore.Library.BAL.Services
             return book;
         }
 
+        public List<Book> GetByIdNew(int id)
+        {
+            return _bookRepository.GetByIdNew(id).ToList();
+        }
+
         public void UpdateBook(int id, Book book)
         {
             _bookRepository.Update(id, book);

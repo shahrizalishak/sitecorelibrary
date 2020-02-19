@@ -187,6 +187,7 @@ namespace SiteCore.Library.DAL
                     while (dataReader.Read())
                     {
                         authorId.Add(Convert.ToInt32(dataReader["AuthorId"]));
+
                     }
                 }
 
@@ -197,6 +198,7 @@ namespace SiteCore.Library.DAL
 
                     SqlCommand command = new SqlCommand(sql, connection);
                     SqlParameter Parameter = new SqlParameter("Id", authoridnew);
+                    command.Parameters.Add(Parameter);
                     using (SqlDataReader dataReader = command.ExecuteReader())
                     {
                         while (dataReader.Read())
@@ -242,31 +244,55 @@ namespace SiteCore.Library.DAL
             return bookToEdit;
         }
 
-        public Book GetByIdNew(int id)
+        public IList<Book> GetByIdNew(int id)
         {
-            Book bookToEdit = new Book();
+            //Book bookToEdit = new Book();
+
+            var bookList = new List<Book>();
+            var bookData = new List<BookAuthor>();
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "Select * From Books Where Id = @Id";
+                string sql = "select b.Id, b.Title, a.Name from Books as b JOIN BookAuthor as ba " +
+                    "on b.Id = ba.BookId JOIN Authors AS a ON ba.AuthorId = a.Id where BookID = @Id";
 
                 SqlCommand command = new SqlCommand(sql, connection);
                 SqlParameter idParameter = new SqlParameter("Id", id);
                 command.Parameters.Add(idParameter);
-
                 using (SqlDataReader dataReader = command.ExecuteReader())
                 {
                     while (dataReader.Read())
                     {
-                        bookToEdit.Id = Convert.ToInt32(dataReader["Id"]);
-                        bookToEdit.Title = dataReader["Title"].ToString();
-                        //bookToEdit.Author = dataReader["Author"].ToString();
+                        bookData.Add(new BookAuthor
+                        {
+                            BookId = Convert.ToInt32(dataReader["Id"]),
+                            BookTitle = dataReader["Title"].ToString(),
+                            AuthorName = dataReader["Name"].ToString()
+                        });
                     }
                 }
             }
 
-            return bookToEdit;
+            var booksByTitle = bookData.GroupBy(b => b.BookTitle).ToList();
+
+            foreach (var book in booksByTitle)
+            {
+                var record = new Book();
+
+                foreach (var item in book)
+                {
+                    record.Id = item.BookId;
+                    record.Title = item.BookTitle;
+                    record.Author.Add(item.AuthorName);
+                }
+
+                bookList.Add(record);
+            }
+
+            return bookList;
+
+            //return bookToEdit;
         }
 
         public void Update(int id, Book book)

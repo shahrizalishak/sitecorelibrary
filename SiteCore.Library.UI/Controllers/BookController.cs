@@ -38,9 +38,13 @@ namespace SiteCore.Library.UI.Controllers
         // GET: Book/Details/5
         public ActionResult Details(int id)
         {
-            var book = bookService.GetById(id);
-            var books = bookService.GetAuthorsById(id);
-            return View(book);
+            var books = bookService.GetByIdNew(id);
+            //var books = bookService.GetAuthorsById(id);
+            var bookViewModel = new BookViewModel()
+            {
+                Books = books
+            };
+            return View(bookViewModel);
         }
 
         // GET: Book/Create
