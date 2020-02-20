@@ -25,13 +25,32 @@ namespace SiteCore.Library.UI.Controllers
         }
 
         // GET: Book
-        public ActionResult Index()
+        public ActionResult Index(int? pageNumber, string sortOrder)
         {
-            var books = bookService.GetAll();
-            var bookViewModel = new BookViewModel()
+            int pageSize = 2;
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["BookSortParm"] = String.IsNullOrEmpty(sortOrder) ? "book_desc" : "";
+            ViewData["AuthorSortParm"] = sortOrder == "Author" ? "author_desc" : "Author";
+
+            var books = bookService.GetAll().AsQueryable();
+
+            switch (sortOrder)
             {
-                Books = books
-            };
+                case "book_desc":
+                    books = books.OrderByDescending(b => b.Title);
+                    break;
+                case "Author":
+                    books = books.OrderBy(b => b.AuthorList);
+                    break;
+                case "author_desc":
+                    books = books.OrderByDescending(b => b.AuthorList);
+                    break;
+                default:
+                    books = books.OrderBy(b => b.Title);
+                    break;
+            }
+
+            var bookViewModel = BookViewModel.Create(books.ToList(), pageNumber ?? 1, pageSize);
             return View(bookViewModel);
         }
 
@@ -40,7 +59,7 @@ namespace SiteCore.Library.UI.Controllers
         {
             var books = bookService.GetByIdNew(id);
             //var books = bookService.GetAuthorsById(id);
-            var bookViewModel = new BookViewModel()
+            var bookViewModel = new DetailsBookViewModel()
             {
                 Books = books
             };
@@ -95,8 +114,15 @@ namespace SiteCore.Library.UI.Controllers
         // GET: Book/Edit/5
         public ActionResult Edit(int id)
         {
-            var book = bookService.GetById(id);
-            return View(book);
+            var authors = bookService.GetAuthors();
+            var books = bookService.GetByIdNew(id);
+            //var books = bookService.GetAuthorsById(id);
+            var bookViewModel = new DetailsBookViewModel()
+            {
+                Books = books,
+                AvailableAuthors = authors
+            };
+            return View(bookViewModel);
         }
 
         // POST: Book/Edit/5
@@ -106,6 +132,7 @@ namespace SiteCore.Library.UI.Controllers
         {
             try
             {
+
                 bookService.UpdateBook(id, book);
                 return RedirectToAction(nameof(Index));
             }

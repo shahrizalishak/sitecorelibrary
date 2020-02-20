@@ -106,7 +106,7 @@ namespace SiteCore.Library.DAL
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "select b.Id, b.Title, a.Name from Books as b JOIN BookAuthor as ba " +
+                string sql = "select b.Id, b.Title, a.Name, a.Id from Books as b JOIN BookAuthor as ba " +
                     "on b.Id = ba.BookId JOIN Authors AS a ON ba.AuthorId = a.Id";
 
                 SqlCommand command = new SqlCommand(sql, connection);
@@ -118,7 +118,8 @@ namespace SiteCore.Library.DAL
                         {
                             BookId = Convert.ToInt32(dataReader["Id"]),
                             BookTitle = dataReader["Title"].ToString(),
-                            AuthorName = dataReader["Name"].ToString()
+                            AuthorName = dataReader["Name"].ToString(),
+                            AuthorId = Convert.ToInt32(dataReader["Id"])
                         });
                     }
                 }
@@ -135,6 +136,7 @@ namespace SiteCore.Library.DAL
                     record.Id = item.BookId;
                     record.Title = item.BookTitle;
                     record.Author.Add(item.AuthorName);
+                    record.AuthorId.Add(item.AuthorId);
                 }
 
                 bookList.Add(record);
@@ -268,7 +270,8 @@ namespace SiteCore.Library.DAL
                         {
                             BookId = Convert.ToInt32(dataReader["Id"]),
                             BookTitle = dataReader["Title"].ToString(),
-                            AuthorName = dataReader["Name"].ToString()
+                            AuthorName = dataReader["Name"].ToString(),
+                            AuthorId = Convert.ToInt32(dataReader["Id"])
                         });
                     }
                 }
@@ -285,6 +288,7 @@ namespace SiteCore.Library.DAL
                     record.Id = item.BookId;
                     record.Title = item.BookTitle;
                     record.Author.Add(item.AuthorName);
+                    record.AuthorId.Add(item.AuthorId);
                 }
 
                 bookList.Add(record);
@@ -316,6 +320,63 @@ namespace SiteCore.Library.DAL
                     command.CommandType = CommandType.Text;
                     command.ExecuteNonQuery();
                 }
+            }
+        }
+
+        public void UpdateNew(int id, Book book)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql =
+                    "Update Books set Title=@Title Where Id=@Id";
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    SqlParameter titleParameter = new SqlParameter("Title", book.Title);
+                    SqlParameter idParameter = new SqlParameter("Id", book.Id);
+
+                    command.Parameters.Add(titleParameter);
+                    command.Parameters.Add(idParameter);
+
+                    command.CommandType = CommandType.Text;
+                    command.ExecuteNonQuery();
+
+                }
+
+                //string sqlQueryNewBook = "Select * From Books Where Title = @Title";
+
+                //SqlCommand commandQuery = new SqlCommand(sqlQueryNewBook, connection);
+                //SqlParameter bookTitleParameter = new SqlParameter("Title", book.Title);
+                //commandQuery.Parameters.Add(bookTitleParameter);
+
+                //using (SqlDataReader dataReader = commandQuery.ExecuteReader())
+                //{
+                //    while (dataReader.Read())
+                //    {
+                //        book.Id = Convert.ToInt32(dataReader["Id"]);
+                //    }
+                //}
+
+                foreach (var authorId in book.AuthorId)
+                {
+                    sql =
+                    $"Update Into BookAuthor (AuthorId) Values  (@AuthorId) where BookId = @Id";
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlParameter authorParameter = new SqlParameter("BookId", authorId);
+                        SqlParameter bookIdParameter = new SqlParameter("Id", book.Id);
+
+                        command.Parameters.Add(authorParameter);
+                        command.Parameters.Add(bookIdParameter);
+
+                        command.CommandType = CommandType.Text;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+
             }
         }
     }
